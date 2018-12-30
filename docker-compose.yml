@@ -14,7 +14,28 @@ services:
       - ./traefik.toml:/traefik.toml
       - ./acme.json:/acme.json
     container_name: traefik
+  portainer:
+    image: portainer/portainer
+    restart: always
+    expose:
+      - "9000"
+    command: -H unix:///var/run/docker.sock
+    networks:
+      - bugatti-net
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - portainer-volume:/data
+    labels:
+      - "traefik.frontend.rule=Host:portainer.thegc.cf"
+      - "traefik.enable=true"
+      - "traefik.docker.network=bugatti-net"
+      - "traefik.port=9000"
+      - "traefik.backend=portainer"
 
 networks:
   bugatti-net:
+    external: true
+
+volumes:
+  portainer-volume:
     external: true
